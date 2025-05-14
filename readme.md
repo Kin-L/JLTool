@@ -20,15 +20,15 @@ roma  | 罗马音
 ![ (4).png](./pic/4.png)  
 #### 处理界面信息反馈
 自动识别非日语歌词并跳过，并跳过不支持文件的类型  
-![ (5).png](pic/5.png)  
+![ (5).png](./pic/5.png)  
 #### 无翻译的歌词处理情况(歌词查看软件为musicbee)
 ##### 处理前后
-![ (6).png](pic/6.png)![ (8).png](pic/8.png)  
+![ (6).png](./pic/6.png)![ (8).png](./pic/8.png)  
 #### 有翻译的歌词处理情况
 ##### 处理前后
-![ (7).png](pic/7.png)![ (1).png](pic/1.png)  
+![ (7).png](./pic/7.png)![ (1).png](./pic/1.png)  
 #### 文本文件处理
 ##### 处理前后
-![ (3).png](pic/3.png)![ (2).png](pic/2.png)  
+![ (3).png](./pic/3.png)![ (2).png](./pic/2.png)  
 
 
