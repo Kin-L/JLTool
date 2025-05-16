@@ -1,3 +1,4 @@
+import os
 import pykakasi
 import re
 from mutagen.flac import FLAC
@@ -476,16 +477,35 @@ def main(in_path):
         print("             error:读取异常")
 
 
-def from_file():
-    global seq
-    initial_dir, seq = load_last_folder()
-    file_paths = filedialog.askopenfilenames(initialdir=initial_dir)
-    save_last_folder(path.split(file_paths[0])[0])
-    for _i, file_path in enumerate(file_paths):
+def dir_to_files(_dir):
+    file_path = []
+    for _root, _ds, _fs in enumerate(os.walk(_dir)):
+        for _f in _fs:
+            file_path = [path.join(_root, _f)]
+    return file_path
+
+
+def proc(_file_list):
+    for _i, file_path in enumerate(_file_list):
         print("-------------------------------------------")
         print(f"开始处理[{_i}]："+file_path)
         main(file_path)
     print("===========================================")
+
+
+def from_file():
+    global seq
+    initial_dir, seq = load_last_folder()
+    file_paths = filedialog.askopenfilenames(initialdir=initial_dir)
+    save_last_folder(path.split(file_paths[0])[0], seq)
+
+    file_list = []
+    for _path in file_paths:
+        if os.path.isdir(_path):
+            file_list += dir_to_files(_path)
+        else:
+            file_list += [_path]
+    proc(file_list)
 
 
 def from_folder():
@@ -493,19 +513,14 @@ def from_folder():
     initial_dir, seq = load_last_folder()
     folder_path = filedialog.askdirectory(initialdir=initial_dir)
     save_last_folder(folder_path, seq)
-    for _i, name in enumerate(listdir(folder_path)):
-        in_path = path.join(folder_path, name)
-        print("-------------------------------------------")
-        print(f"开始处理[{_i}]：" + in_path)
-        main(in_path)
-    print("===========================================")
+    proc(dir_to_files(folder_path))
 
 
 if __name__ == "__main__":
     print("============欢迎使用日语音乐歌词注音工具============")
     print("======使用前请做好数据备份，本工具不能替代人工检查=====")
     print("作者B站： 绘星痕")
-    print("项目地址：https://github.com/Kin-L")
+    print("项目地址：\nhttps://github.com/Kin-L/JLTool\nhttps://gitee.com/huixinghen/JLTool")
     if len(sys.argv) > 1:
         print("Tips:默认设置歌词顺序为 中文-假名-日语 \n"
               "如需更改请在config.json文件中修改\n"
@@ -515,22 +530,13 @@ if __name__ == "__main__":
               "kanji | 日语\n"
               "roma  | 罗马音")  # "chin-hira-kanji"
         seq = load_last_folder()[1]
-        num = 0
+        file_list = []
         for cm in sys.argv[1:]:
-
-            if path.isdir(cm):
-                for name in listdir(cm):
-                    in_path = path.join(cm, name)
-                    print("-------------------------------------------")
-                    print(f"开始处理[{num}]：" + in_path)
-                    main(in_path)
-                    num += 1
+            if os.path.isdir(cm):
+                file_list += dir_to_files(cm)
             else:
-                print("-------------------------------------------")
-                print(f"开始处理[{num}]：" + cm)
-                main(cm)
-                num += 1
-        print("===========================================")
+                file_list += [cm]
+        proc(file_list)
         input("敲击回车结束并关闭窗口")
     else:
         print("============本窗口显示处理信息，请勿关闭============")

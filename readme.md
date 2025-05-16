@@ -6,7 +6,9 @@
 5.可双击JLTool.exe文件启动后，点击按钮选择文件夹或文件；也可拖动文件夹或文件到JLTool.exe文件上执行  
 6.双击JLTool.exe文件启动并执行一次任务后会生成“config.json”设置文件，可在其中修改设置  
 ### 作者B站： 绘星痕  
-### 项目地址：https://github.com/Kin-L  
+### 项目地址：  
+https://github.com/Kin-L/JLTool  
+https://gitee.com/huixinghen/JLTool
 ### Tips:  
 默认设置歌词顺序为 中文-假名-日语  
 如需更改请在config.json文件中修改  
@@ -30,5 +32,8 @@ roma  | 罗马音
 #### 文本文件处理
 ##### 处理前后
 ![ (3).png](./pic/3.png)![ (2).png](./pic/2.png)  
-
+#### 椒盐音乐界面展示
+##### 处理前后
+<img src="./pic/91.jpg" width="20%" alt="" align=center />
+<img src="./pic/9.jpg" width="20%" alt="" align=center />
 
