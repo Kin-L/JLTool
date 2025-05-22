@@ -2,3 +2,5 @@
 pykakasi
 mutagen
 pyinstaller
+openai
+langid
