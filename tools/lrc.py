@@ -98,10 +98,10 @@ def lrc_split(lrc_lines: list) -> [list, list, list]:
     for num, line in enumerate(lrc_lines):
         if bool(re.search(_pat2, line)) and num < lnum+5:
             lnum = num
-    _lis2 = lrc_lines[:lnum+1]
+    _lis2 = lrc_lines[:lnum]
     if lnum == len(lrc_lines):
         return [], [], []
-    for line in lrc_lines[lnum+1:]:
+    for line in lrc_lines[lnum:]:
         line = line.strip()
         if not line:
             continue

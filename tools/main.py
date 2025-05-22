@@ -13,7 +13,7 @@ class UI:
         self.config_file = 'config.json'
         self.title = title
         self.lrc_backup = ""
-        self.initial_dir, self.seq_line = self.load_last_folder()
+        self.initial_dir, self.seq_line, self.ds_key = self.load_last_folder()
         if self.initial_dir and not path.exists(self.initial_dir):
             raise ValueError("last_folder 路径不存在")
         if self.seq_line:
@@ -86,12 +86,12 @@ class UI:
         if path.exists(self.config_file):
             with open(self.config_file, 'r') as file:
                 config = json.load(file)
-                return config.get('last_folder', ''), config.get('seq', '')
-        return '', self.seq
+                return config.get('last_folder', ''), config.get('seq', ''), config.get('ds_key', '')
+        return '', self.seq, ""
 
     # 保存当前选择的文件夹路径
     def save_last_folder(self, folder_path):
-        config = {'last_folder': folder_path, "seq": self.seq_line}
+        config = {'last_folder': folder_path, "seq": self.seq_line, 'ds_key': self.ds_key}
         with open(self.config_file, 'w', encoding='utf-8') as file:
             json.dump(config, file)
 

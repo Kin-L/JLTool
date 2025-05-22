@@ -14,10 +14,6 @@ class DSUI(UI):
         self.key = ""
         if not path.exists("output"):
             makedirs("output")
-        if path.exists(self.config_file):
-            with open(self.config_file, 'r') as file:
-                config = json.load(file)
-                self.key = config.get('ds_key', '')
         if self.key:
             self.dsapi = DSAPI(self.key)
         else:
@@ -80,11 +76,6 @@ class DSUI(UI):
                 print(f"不为日语歌词:{in_path}")
         else:
             print(f"error:读取异常:{in_path}")
-
-    def save_last_folder(self, folder_path):
-        config = {'last_folder': folder_path, "seq": self.seq_line, 'ds_key': self.key}
-        with open(self.config_file, 'w', encoding='utf-8') as file:
-            json.dump(config, file)
 
     def process_file(self, file_path, i):
         try:
