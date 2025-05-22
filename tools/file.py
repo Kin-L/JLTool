@@ -117,7 +117,7 @@ class MusicLrcEditor:
         """读取MP3文件的歌词"""
         try:
             audio = ID3(file_path)
-            # 查找USLT帧（非同步歌词）
+            # 查找USLT帧（非同步
             for frame in audio.values():
                 if isinstance(frame, USLT):
                     return frame.text

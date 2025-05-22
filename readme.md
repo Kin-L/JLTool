@@ -5,6 +5,9 @@
 4.该工具不能替代人工检查，注音功能不完全准确，和修改错误的部分  
 5.可双击JLTool.exe文件启动后，点击按钮选择文件夹或文件；也可拖动文件夹或文件到JLTool.exe文件上执行  
 6.双击JLTool.exe文件启动并执行一次任务后会生成“config.json”设置文件，可在其中修改设置  
+7.JLTool-kks使用kks库进行注音，不能进行翻译，可能对歌词文件文本行进行整理。  
+JLTool-ds调用deekseek进行注音和翻译，流程很慢，并需要在config.json中填写deepseek的api_key  
+8.lyrics文件夹备份进行修改前的歌词文本，output文件夹记录deepseek返回信息
 ### 作者B站： 绘星痕  
 ### 项目地址：  
 https://github.com/Kin-L/JLTool  

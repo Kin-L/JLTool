@@ -4,7 +4,6 @@ import tkinter as tk
 from tkinter import filedialog
 import sys
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
 
 
 class UI:
@@ -86,8 +85,8 @@ class UI:
         if path.exists(self.config_file):
             with open(self.config_file, 'r') as file:
                 config = json.load(file)
-                return config.get('last_folder', ''), config.get('seq', ''), config.get('ds_key', '')
-        return '', self.seq, ""
+                return config.get('last_folder', ''), config.get('seq', "chin-hira-kanji"), config.get('ds_key', '')
+        return '', "chin-hira-kanji", ""
 
     # 保存当前选择的文件夹路径
     def save_last_folder(self, folder_path):
@@ -97,7 +96,7 @@ class UI:
 
     @staticmethod
     # GUI窗口居中显示
-    def center_window(_root, width=300, height=150):
+    def center_window(_root, width=330, height=150):
         screen_width = _root.winfo_screenwidth()
         screen_height = _root.winfo_screenheight()
         x = (screen_width // 2) - (width // 2)

@@ -3,7 +3,7 @@ from tools.lrc import lrc_sort, lrc_split, get_lrc_root, check_jap
 from tools.file import MusicLrcEditor
 from os import path, makedirs, cpu_count
 from tools.dsapi import DSAPI
-import json
+import traceback
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
@@ -11,12 +11,13 @@ from concurrent.futures import ThreadPoolExecutor
 class DSUI(UI):
     def __init__(self):
         UI.__init__(self, "日语音乐歌词注音工具-ds")
-        self.key = ""
         if not path.exists("output"):
             makedirs("output")
-        if self.key:
-            self.dsapi = DSAPI(self.key)
+        if self.ds_key:
+            self.dsapi = DSAPI(self.ds_key)
         else:
+            self.save_last_folder("")
+            input("ds_key 不能为空")
             raise ValueError("ds_key 不能为空")
 
     def main(self, in_path):
@@ -41,7 +42,7 @@ class DSUI(UI):
                     if item == "hira":
                         res = self.dsapi.get_hira(texts)[0]
                         if lennum != len(res):
-                            print(f"处理异常， hira 句数不匹配:{in_path}")
+                            print(f"处理异常，hira 句数不匹配:{in_path}")
                             return
                         lis += [res]
                     elif item == "kanji":
@@ -49,7 +50,7 @@ class DSUI(UI):
                     elif item == "roma":
                         res = self.dsapi.get_roma(texts)
                         if lennum != len(res):
-                            print(f"处理异常， roma 句数不匹配:{in_path}")
+                            print(f"处理异常，roma 句数不匹配:{in_path}")
                             return
                         lis += [res]
                     elif item == "chin":
@@ -62,7 +63,7 @@ class DSUI(UI):
                 for n, ls in enumerate(zip(*lis)):
                     tt = f"[{times[n]}]"
                     for i in ls:
-                        ti = tt+i
+                        ti = tt+i.strip(" ")
                         if ti not in lrc_list:
                             lrc_list += [ti]
                 # print(lrc_list)
@@ -82,7 +83,7 @@ class DSUI(UI):
             print(f"开始处理[{i}]：" + file_path)
             self.main(file_path)
         except Exception as e:
-            print(f"处理错误：{file_path}\n{e}")
+            print(f"处理错误：{file_path}\n{traceback.format_exc()}")
 
     def process(self, _file_list):
         self.lrc_backup = "lyrics/lrc" + datetime.now().strftime("%Y-%m-%d %H-%M-%S")

@@ -222,7 +222,7 @@ def get_lrc_root(lrc_list: list) -> list:
         if px != x:
             num = len(pyl)
             if num > 2:
-                nl += [pyl[0], choose_root(pyl[1:])]
+                nl += [[pyl[0], choose_root(pyl[1:])]]
             elif num == 2:
                 nl += [pyl]
             pyl = [x]
@@ -232,7 +232,7 @@ def get_lrc_root(lrc_list: list) -> list:
     else:
         num = len(pyl)
         if num > 2:
-            nl += [pyl[0], choose_root(pyl[1:])]
+            nl += [[pyl[0], choose_root(pyl[1:])]]
         elif num == 2:
             nl += [pyl]
     return nl
@@ -365,7 +365,7 @@ if __name__ == "__main__":
 [03:00.350]ka ga ya ki no shuu te i n gu su taa
 [03:03.740]o i ka ke te ho shi ni na ru
 [03:28.190]ki ra me ke"""
-    lis1, lis2, lis3 = lrc_split(txt)
+    lis1, lis2, lis3 = lrc_split(txt.split("\n"))
     # print("lis:", lis)
     # lis1, lis2, lis3 = lrc_split2(lis)
     # print("lis1:", lis1)
