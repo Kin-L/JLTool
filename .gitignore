@@ -1,3 +1,5 @@
 .idea/
 lyrics/
 .gitignore/
+.git/
+config.json
