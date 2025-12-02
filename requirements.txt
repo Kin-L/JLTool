@@ -1,0 +1,8 @@
+--index https://mirrors.aliyun.com/pypi/simple
+pykakasi
+mutagen
+pyinstaller
+openai
+langid
+opencc
+MeCab
