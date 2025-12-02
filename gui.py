@@ -2,11 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
 import json
 import os
-from pathlib import Path
-import threading
-import queue
 from datetime import datetime
-import traceback
 from JLTool import JLToolMain
 
 # 配置项映射关系
@@ -38,7 +34,7 @@ class ConfigEditor(tk.Tk):
         self.fail_count = 0
         self.error_count = 0
 
-        self.jlmain: JLToolMain = None
+        self.jlmain: JLToolMain
         self.create_widgets()
         self.load_config_to_gui()
         self.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -55,7 +51,7 @@ class ConfigEditor(tk.Tk):
                 with open(self.config_path, "r", encoding="utf-8") as f:
                     return {**default_config, **json.load(f)}
         except Exception as e:
-            self.log(f"配置文件加载失败: {str(e)}")
+            ...
         return default_config
 
     def save_config(self):
@@ -64,7 +60,7 @@ class ConfigEditor(tk.Tk):
             with open(self.config_path, "w", encoding="utf-8") as f:
                 json.dump(self.config, f, ensure_ascii=False, indent=2)
         except Exception as e:
-            self.log(f"配置文件保存失败: {str(e)}")
+            ...
 
     def create_widgets(self):
         """创建GUI组件"""
@@ -181,14 +177,6 @@ class ConfigEditor(tk.Tk):
         """清空路径文本框"""
         self.path_text.delete("1.0", tk.END)
 
-    def log(self, message):
-        # return
-        """添加日志信息"""
-        # self.log_text.config(state="normal")
-        self.log_text.insert(tk.END, f"[{datetime.now().strftime('%H:%M:%S')}] {message}\n")
-        self.log_text.see(tk.END)
-        # self.log_text.config(state="disabled")
-
     def collect_all_files(self, paths):
         """从路径列表中收集所有有效文件"""
         valid_files = []
@@ -197,13 +185,11 @@ class ConfigEditor(tk.Tk):
             if not path_str:
                 continue
             if not os.path.exists(path_str):
-                self.log(f"路径无效: {path_str}")
+
                 continue
             if os.path.isfile(path_str):
                 if path_str.lower().endswith((".mp3", ".flac", ".opus", ".txt", ".lrc")):
                     valid_files.append(path_str)
-                else:
-                    self.log(f"不支持的文件类型: {path_str}")
             elif os.path.isdir(path_str):
                 for root, _, files in os.walk(path_str):
                     for file in files:
@@ -211,25 +197,13 @@ class ConfigEditor(tk.Tk):
                             valid_files.append(os.path.join(root, file))
         return valid_files
 
-    def update_progress(self):
-        """更新进度条"""
-        if self.total_files > 0:
-            progress = (self.processed_files / self.total_files) * 100
-            self.progress_var.set(progress)
-            self.progress_label.config(text=f"{self.processed_files}/{self.total_files} 文件")
-        if self.processed_files == self.total_files:
-            self.log(f"\n处理完成 - 成功: {self.success_count}, 缺陷: {self.fail_count}, 错误: {self.error_count}")
-            self.start_btn.config(state="normal")
-
     def process_file(self, file_path):
         """处理单个文件（实际处理逻辑需替换为原有核心代码）"""
         try:
             # 这里只是示例，实际应替换为原有main()方法中的处理逻辑
-            self.log(f"处理文件: {file_path}")
             self.jlmain.start(file_path)
             return "success"
         except Exception as e:
-            self.log(f"处理错误 {file_path}: {str(e)}")
             return "error"
 
     def process_worker(self, file_path):
@@ -243,11 +217,10 @@ class ConfigEditor(tk.Tk):
             self.error_count += 1
 
         self.processed_files += 1
-        self.update_progress()
 
     def start_process(self):
-        print("开始处理任务")
         """开始处理任务"""
+        self.start_btn.config(state="disable")
         # 保存当前配置
         self.save_current_config()
 
@@ -255,13 +228,14 @@ class ConfigEditor(tk.Tk):
         paths = self.path_text.get("1.0", tk.END).splitlines()
         if not paths or all(not p.strip() for p in paths):
             messagebox.showwarning("警告", "请添加文件/文件夹路径")
+            self.start_btn.config(state="normal")
             return
 
         # 收集有效文件
-        self.log("开始收集有效文件...")
         valid_files = self.collect_all_files(paths)
         if not valid_files:
             messagebox.showwarning("警告", "没有找到有效文件")
+            self.start_btn.config(state="normal")
             return
         ds_key = ""
         # 验证Deepseek配置
@@ -269,6 +243,7 @@ class ConfigEditor(tk.Tk):
             ds_key = self.ds_key_entry.get().strip()
             if not ds_key:
                 messagebox.showwarning("警告", "请填写Deepseek API密钥")
+                self.start_btn.config(state="normal")
                 return
         self.jlmain = JLToolMain(self.config["seq"], ds_key)
         # 初始化任务状态
@@ -282,7 +257,6 @@ class ConfigEditor(tk.Tk):
         self.start_btn.config(state="disabled")
 
         # 启动工作线程（使用原有代码中的线程池逻辑）
-        self.log(f"开始处理 {self.total_files} 个文件...")
         from concurrent.futures import ThreadPoolExecutor
         from os import cpu_count
 
@@ -300,7 +274,7 @@ class ConfigEditor(tk.Tk):
                 future.result()  # 检查是否有异常
 
         # 等待所有任务完成
-        self.update_progress()
+        self.start_btn.config(state="normal")
 
     def save_current_config(self):
         """保存当前GUI中的配置到内存"""
