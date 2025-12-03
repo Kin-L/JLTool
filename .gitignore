@@ -3,3 +3,4 @@ lyrics/
 .gitignore/
 .git/
 config.json
+logs/
