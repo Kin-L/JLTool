@@ -7,7 +7,8 @@ from tools.dsapi import DSAPI
 
 
 class JLToolMain:
-    def __init__(self, seq, ds_key=""):
+    def __init__(self, seq, logging, ds_key=""):
+        self.logging = logging
         self.seq = seq.split("-")  # 默认使用kks版本
         self.kks = LyrTrans()
         self.ds_key = ds_key
@@ -28,7 +29,7 @@ class JLToolMain:
         """KKS版本处理逻辑"""
         mle = MusicLrcEditor(in_path)
         if not mle.isreadlrc():
-            print(f"error:读取异常:{in_path}")
+            self.logging.error(f"读取异常:{in_path}")
             return "error"
         else:
             lrc = mle.read_lyrics()
@@ -37,16 +38,16 @@ class JLToolMain:
                 return "error"
             prefix, root, invalid = lrc_split(lrc)
             if not root:
-                print(f"非同步歌词:{in_path}")
+                self.logging.info(f"非同步歌词:{in_path}")
                 movefile(in_path, "other")
                 return "other"
             if not check_jap(root):
-                print(f"不为日语歌词:{in_path}")
+                self.logging.info(f"不为日语歌词:{in_path}")
                 movefile(in_path, "other")
                 return "other"
             else:
                 if invalid:
-                    print("\n".join([f"无效行:{in_path}"] + invalid))
+                    self.logging.info("\n".join([f"无效行:{in_path}"] + invalid))
                 root, flag = self.lrclines_trans(root)
                 mle.lrc = prefix + root
                 out_path = path.join(self.lrc_backup, path.splitext(path.split(in_path)[1])[0]) + ".lrc"
@@ -57,7 +58,7 @@ class JLToolMain:
                         movefile(in_path, "defect")
                         return "defect"
                     else:
-                        print(f"处理完成:{in_path}")
+                        self.logging.info(f"处理完成:{in_path}")
                         movefile(in_path, "success")
                         return "success"
 
@@ -71,7 +72,6 @@ class JLToolMain:
                 if time == t:
                     line.append(l)
             praline.append(line)
-        # print(praline)
         res = arrangelines(praline)
         flag = False
         if len(res) != len(praline):
@@ -85,7 +85,7 @@ class JLToolMain:
                 l3 = l3[:-1]
                 l4 = l4[:-1]
                 res = [list(row) for row in zip(*[l0, l1, l2, l3, l4])]
-                print("整理滞后翻译行")
+                self.logging.info("整理滞后翻译行")
         _list = []
         for item in res:
             time, root, chin, hira, roma = item
@@ -112,7 +112,7 @@ class JLToolMain:
         """DS版本处理逻辑"""
         mle = MusicLrcEditor(in_path)
         if mle.isreadlrc():
-            print(f"error:读取异常:{in_path}")
+            self.logging.error(f"读取异常:{in_path}")
             return "error"
         else:
             lrc = mle.read_lyrics()
@@ -121,14 +121,14 @@ class JLToolMain:
                 return "error"
             prefix, root, invalid = lrc_split(lrc)
             if not root:
-                print(f"非同步歌词:{in_path}")
+                self.logging.info(f"非同步歌词:{in_path}")
                 movefile(in_path, "other")
                 return "other"
             elif invalid:
-                print("\n".join([f"无效行:{in_path}"] + invalid))
+                self.logging.info("\n".join([f"无效行:{in_path}"] + invalid))
 
             if not check_jap(root):
-                print(f"不为日语歌词:{in_path}")
+                self.logging.info(f"不为日语歌词:{in_path}")
                 movefile(in_path, "other")
                 return "other"
             else:
@@ -137,7 +137,6 @@ class JLToolMain:
                     lambda line: line.replace("\u3000", " ").replace("　", " ").strip(), texts))
                 flag = 0
                 texts = [list(row) for row in zip(*[times, texts])]
-                # print(times, texts)
                 for item in self.seq:
                     if item == "hira":
                         inp = list(texts)
@@ -158,7 +157,6 @@ class JLToolMain:
                         texts = self.dsapi.get_trans(texts, in_path)
                         if len(inp) != len(texts):
                             flag += 1
-                # print(lis)
 
                 lrc_list = prefix
                 texts = listsort(texts)
@@ -168,22 +166,19 @@ class JLToolMain:
                         ti = tt + i
                         if ti not in lrc_list:
                             lrc_list.append(ti)
-                # print(lrc_list)
                 mle.lrc = lrc_list
                 out_path = path.splitext(path.join(self.lrc_backup, path.split(in_path)[1]))[0] + ".lrc"
                 with open(out_path, 'w+', encoding='utf-8') as f:
                     f.writelines(lrc)
                 if mle.write_lyrics():
                     if flag:
-                        print(f"处理异常:歌词主体结构多次变动({flag}) {in_path}")
+                        self.logging.info(f"处理异常:歌词主体结构多次变动({flag}) {in_path}")
                         dire = "defect"
                     else:
-                        print(f"处理完成:{in_path}")
+                        self.logging.info(f"处理完成:{in_path}")
                         dire = "success"
                     movefile(in_path, dire)
                     return dire
-
-
 
 
 if __name__ == "__main__":

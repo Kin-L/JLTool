@@ -7,6 +7,7 @@ from JLTool import JLToolMain
 import logging
 import threading
 import queue
+import traceback
 
 # 配置项映射关系
 SEQ_OPTIONS = [
@@ -159,7 +160,7 @@ class ConfigEditor(tk.Tk):
         left_panel.pack(side="left", fill="both", expand=True)
 
         # 1. 序列选择区域
-        seq_frame = ttk.LabelFrame(left_panel, text="序列配置(seq)")
+        seq_frame = ttk.LabelFrame(left_panel, text="序列配置")
         seq_frame.pack(fill="x", padx=5, pady=5)
 
         self.seq_combos = []
@@ -405,20 +406,18 @@ class ConfigEditor(tk.Tk):
 
             if result == "success":
                 self.success_count += 1
-                logging.info(f"✓ 处理成功: {os.path.basename(file_path)}")
             elif result == "defect":
                 self.fail_count += 1
-                logging.warning(f"⚠ 处理缺陷: {os.path.basename(file_path)}")
             elif result == "other":
                 self.other_count += 1
-                logging.info(f"ℹ 非日语歌词: {os.path.basename(file_path)}")
             else:
                 self.error_count += 1
-                logging.error(f"✗ 处理错误: {os.path.basename(file_path)}")
 
         except Exception as e:
+            errinfo = str(e) + "\n" + traceback.format_exc()
+
             self.error_count += 1
-            logging.error(f"✗ 处理异常: {os.path.basename(file_path)} - {str(e)}")
+            logging.error(f"处理异常: {os.path.basename(file_path)} - {errinfo}")
 
         self.processed_files += 1
         self.update_stats()
@@ -458,7 +457,7 @@ class ConfigEditor(tk.Tk):
                 return
 
         # 初始化工具
-        self.jlmain = JLToolMain(self.config["seq"], ds_key)
+        self.jlmain = JLToolMain(self.config["seq"], logging, ds_key)
 
         # 初始化任务状态
         self.total_files = len(valid_files)
