@@ -5,7 +5,6 @@ import pykakasi
 import langid
 import opencc
 import MeCab
-import unicodedata
 pattern = r'\[(\d{1,3}):(\d{1,2})(?:[.:](\d{1,3}))?\]'
 _pat1 = re.compile(r'\[[a-zA-Z]+:')
 _pat2 = re.compile(r'[词詞曲歌手制作人原唱]\s*[:∶：]')  # r'词：|曲：|歌手：'

@@ -32,8 +32,10 @@ class ConfigEditor(tk.Tk):
         self.processed_files = 0
         self.success_count = 0
         self.fail_count = 0
+        self.other_count = 0
         self.error_count = 0
 
+        self.jlmain = None
         self.jlmain: JLToolMain
         self.create_widgets()
         self.load_config_to_gui()
@@ -197,22 +199,18 @@ class ConfigEditor(tk.Tk):
                             valid_files.append(os.path.join(root, file))
         return valid_files
 
-    def process_file(self, file_path):
-        """处理单个文件（实际处理逻辑需替换为原有核心代码）"""
+    def process_worker(self, file_path):
         try:
             # 这里只是示例，实际应替换为原有main()方法中的处理逻辑
-            self.jlmain.start(file_path)
-            return "success"
+            result = self.jlmain.start(file_path)
         except Exception as e:
-            return "error"
-
-    def process_worker(self, file_path):
-        result = self.process_file(file_path)
-
+            result = "error"
         if result == "success":
             self.success_count += 1
         elif result == "defect":
             self.fail_count += 1
+        elif result == "other":
+            self.other_count += 1
         else:
             self.error_count += 1
 
@@ -251,6 +249,7 @@ class ConfigEditor(tk.Tk):
         self.processed_files = 0
         self.success_count = 0
         self.fail_count = 0
+        self.other_count = 0
         self.error_count = 0
         self.progress_var.set(0)
         self.progress_label.config(text=f"0/{self.total_files} 文件")

@@ -1,6 +1,5 @@
 import re
-import shutil
-from os import path, makedirs
+from os import path
 from tools.main import UI
 from tools.lrc import LyrTrans, lrc_split, check_jap, choose_root, arrangelines, checktrans, movefile
 from tools.file import MusicLrcEditor
