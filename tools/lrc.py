@@ -16,6 +16,7 @@ _pat4 = re.compile(r'[\u4e00-\u9faf'
                    r'\U0002b740-\U0002b81f'
                    r'\U0002b820-\U0002ceaf]')
 _pat5 = re.compile(r'\[(\d{1,3}):(\d{1,2})(?:[.:](\d{1,3}))?\]')
+_kks = pykakasi.kakasi()
 
 
 def spstring(text):
@@ -24,18 +25,6 @@ def spstring(text):
     text = re.sub(r'\s+', '', text).strip()
     return katakana_to_hiragana(text).lower()
 
-def katakana_to_hiragana(text):
-    hiragana = []
-    for char in text:
-        code = ord(char)
-        # 片假名范围: 0x30A0-0x30FF
-        # 平假名范围: 0x3040-0x309F
-        if 0x30A0 <= code <= 0x30FF:
-            hiragana_char = chr(code - 0x60)  # 片假名和平假名的Unicode码相差96(0x60)
-            hiragana.append(hiragana_char)
-        else:
-            hiragana.append(char)
-    return ''.join(hiragana)
 
 def checktrad(text):
     """判断字符串是否包含繁体字"""
@@ -43,8 +32,6 @@ def checktrad(text):
     simplified = converter.convert(text)
     # print(simplified)
     return simplified != text  # 如果转换前后不同，说明包含繁体字
-
-
 
 
 def katakana_to_hiragana(katakana):
@@ -72,47 +59,40 @@ def add_furigana(text, use_hiragana=True):
     """
     # 初始化MeCab分词器
     tagger = MeCab.Tagger()
-
     # 解析文本
     node = tagger.parseToNode(text)
-
     # 存储结果的列表
     result = []
-
     # 遍历解析结果
     while node:
         # 获取表面形式
         surface = node.surface
         # 获取特征信息（包含读音）
         feature = node.feature
-
         # 只有非空字符串才处理
         if surface:
-            # 分割特征信息
-            feature_parts = feature.split(',')
-
-            # 读音通常在第7个位置（索引6）
-            if len(feature_parts) > 7 and feature_parts[6] and feature_parts[6] != '*':
-                reading = feature_parts[6]
-
-                # 如果需要平假名，则进行转换
-                if use_hiragana:
-                    phonetic = katakana_to_hiragana(reading)
-                else:
-                    phonetic = reading
-
-                # 当表面形式与读音不同时才添加注音
-                if reading != surface:
+            _line = ""
+            for item in _kks.convert(surface):
+                _line += item["hira"]
+            if _line == surface:
+                result.append(surface)
+            else:
+                # 分割特征信息
+                feature_parts = feature.split(',')
+                # 读音通常在第7个位置（索引6）
+                if len(feature_parts) > 7 and feature_parts[6] and feature_parts[6] != '*':
+                    reading = feature_parts[6]
+                    # 如果需要平假名，则进行转换
+                    if use_hiragana:
+                        phonetic = katakana_to_hiragana(reading)
+                    else:
+                        phonetic = reading
                     result.append(phonetic)
                 else:
+                    # 没有读音信息时直接添加表面形式
                     result.append(surface)
-            else:
-                # 没有读音信息时直接添加表面形式
-                result.append(surface)
-
         # 移动到下一个节点
         node = node.next
-
     return ''.join(result)
 
 
@@ -121,13 +101,14 @@ class LyrTrans:
         # 输入日语，返回注音
         # "hira" 平假名
         # "kana" 片假名
-        self.kks = pykakasi.kakasi()
+        self.kks = _kks
 
     def trans(self, _text: str, _seq: str = "hira"):
         res = add_furigana(_text)
-        
-        if _seq == "hira":
+        # print(_text)
+        # print( res)
 
+        if _seq == "hira":
             if res == _text:
                 return _text
             else:
@@ -178,6 +159,7 @@ class LyrTrans:
                 _j -= 1
 
         return ''.join(reversed(align1))
+
 
 def stringconv(text):
     punctuation_pattern = '\xa0\u3000'
